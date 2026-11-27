@@ -136,7 +136,7 @@ table.t tr.tot td{font-weight:800;border-top:2px solid var(--navy)}
           <div class="fg"><label>Aflosvorm</label><select id="i_afl"><option value="ann">Annuïtair</option><option value="lin">Lineair</option></select></div>
         </div>
         <div class="row2">
-          <div class="fg"><label>Aftrektarief</label><select id="i_tax"><option value="37.56">37,56%</option><option value="35.75">35,75%</option></select></div>
+          <div class="fg"><label>Aftrektarief</label><select id="i_tax"><option value="auto" selected>Automatisch (hoogste inkomen)</option><option value="37.56">37,56%</option><option value="35.75">35,75%</option></select></div>
           <div class="fg"><label>WOZ-waarde</label><div class="eur"><input type="text" class="e" id="i_woz" value="450000"></div></div>
         </div>
       </div></div>
@@ -212,7 +212,7 @@ table.t tr.tot td{font-weight:800;border-top:2px solid var(--navy)}
       </div></div>
 
       <div class="card"><h2>Bestaande hypotheek</h2><div class="bd">
-        <div class="fg"><label>Restschuld</label><div class="eur"><input type="text" class="e" id="o_rs" value="80000"></div></div>
+        <div class="row2"><div class="fg"><label>Restschuld</label><div class="eur"><input type="text" class="e" id="o_rs" value="80000"></div></div><div class="fg"><label>Resterende looptijd</label><select id="o_loop"></select></div></div>
         <div class="row3">
           <div class="fg"><label>Rente</label><div class="pctw"><input type="number" id="o_rr" value="3.9" step="0.01"></div></div>
           <div class="fg"><label>Rentevast</label><select id="o_rvp"><option value="5">5 jr</option><option value="10" selected>10 jr</option><option value="20">20 jr</option></select></div>
@@ -390,7 +390,7 @@ const kEur = v => v>=1e6 ? '€ '+NF1.format(v/1e6)+' mln' : v<=0 ? '€ 0' : '�
 function calcIngroei(){
   const W=val('i_w'), eigen=val('i_eigen'), bpct=val('i_bpct')/100, g=val('i_g')/100;
   const label=$('i_label').value, ebv=val('i_ebv');
-  const rente=val('i_rente'), rvp=+$('i_rvp').value, afl=$('i_afl').value, tax=val('i_tax')/100, woz=val('i_woz');
+  const rente=val('i_rente'), rvp=+$('i_rvp').value, afl=$('i_afl').value, woz=val('i_woz');
   const ink1=val('i_ink1'), ink2=val('i_ink2'), inkomen=ink1+ink2;
   const single=$('i_single').checked, aow=$('i_aow').checked, verpl=val('i_ver'), inkg=val('i_inkg')/100;
   const bodem=(val('i_bb')+val('i_bo'))/100; $('i_bt').value=pct(bodem*100,2);
@@ -404,15 +404,21 @@ function calcIngroei(){
   const ltv = totaal/W;
 
   // Maandlasten jaar 1 (A-deel)
+  // Box 1 2026: 35,75% t/m € 38.883, 37,56% t/m € 78.426, daarboven 49,50%; aftrek max. 37,56%
+  const marg = Math.max(ink1,ink2)>78426 ? 0.495 : Math.max(ink1,ink2)>38883 ? 0.3756 : 0.3575;
+  const tax = $('i_tax').value==='auto' ? Math.min(marg,0.3756) : val('i_tax')/100;
+  const taxEwf = $('i_tax').value==='auto' ? marg : tax;
   const sch = schema(A, rente, 30, afl);
   const j1 = sch[0];
   const brutoM = (j1.rente+j1.aflossing)/12;
   const ewf = woz*NORM.ewf;
-  const aftrek = Math.max(0, j1.rente - ewf)*tax;
+  // Fiscaal voordeel = rente × aftrektarief − EWF × marginaal tarief; bij rente < EWF Wet Hillen (2026: 73⅓% van het verschil vrijgesteld)
+  const fisc = r => r>=ewf ? r*tax - ewf*taxEwf : -(ewf-r)*(1-0.733333)*taxEwf;
+  const aftrek = fisc(j1.rente);
   const nettoM = brutoM - aftrek/12;
   const regSch = schema(totaal, rente, 30, afl)[0];
   const regBruto = (regSch.rente+regSch.aflossing)/12;
-  const regNetto = regBruto - Math.max(0, regSch.rente-ewf)*tax/12;
+  const regNetto = regBruto - fisc(regSch.rente)/12;
 
   // Toetslast
   const tr = mh.tr;
@@ -449,7 +455,7 @@ function calcIngroei(){
   if(mh.extraEbv) t+=`<tr><td>+ Energiebesparende voorzieningen (art. 4 lid 4)</td><td>${eur(mh.extraEbv)}</td></tr>`;
   t+=`<tr class="tot"><td>Maximale hypotheek op inkomen</td><td>${eur(mh.max)}</td></tr>`;
   t+=`<tr><td>Maximaal op waarde (LTV)</td><td>${eur(ltvMax)}</td></tr>`;
-  t+=`<tr class="hl"><td>Woningwaarde haalbaar met B-deel ${pct(bpct*100,0)} (productaanname)</td><td>${eur(bpct<1? mh.max/(1-bpct) : mh.max)}</td></tr>`;
+  t+=`<tr class="hl"><td>Woningwaarde haalbaar met B-deel ${pct(bpct*100,0)} (productaanname)</td><td>${eur(bpct<1? (mh.max+eigen)/(1-bpct) : mh.max)}</td></tr>`;
   $('i_maxtbl').innerHTML=t;
 
   $('i_afm').innerHTML = `<b>⚠ AFM/compliance — B-deel in de leencapaciteit.</b> Art. 3 Trhk toetst de financieringslast over het <i>totale</i> hypothecair krediet op annuïtaire basis. Wordt het B-deel juridisch als hypothecair krediet gekwalificeerd, dan telt het mee en is de extra koopkracht niet beschikbaar (strikte toets hierboven). De weergegeven "koopkracht met B-deel" is een <b>productaanname</b> die bevestiging door de AFM/juridische toets vereist vóór gebruik in klantuitingen. Ook het B-deel is niet kosteloos: de bodemvergoeding van ${pct(bodem*100,2)} p.j. samengesteld wordt bij overname of verkoop afgerekend.`;
@@ -461,9 +467,9 @@ function calcIngroei(){
   m+=rij('Rente per maand', j1.rente/12, regSch.rente/12);
   m+=rij('Aflossing per maand', j1.aflossing/12, regSch.aflossing/12);
   m+=rij('Bruto maandlast', brutoM, regBruto);
-  m+=rij('Fiscaal voordeel per maand', aftrek/12, Math.max(0,regSch.rente-ewf)*tax/12);
+  m+=rij('Fiscaal voordeel per maand', aftrek/12, fisc(regSch.rente)/12);
   m+=`<tr class="tot"><td>Netto maandlast</td><td>${eur(nettoM)}</td><td>${eur(regNetto)}</td><td>${eur(regNetto-nettoM)}</td></tr>`;
-  m+=`<tr><td colspan="4" style="text-align:left;color:var(--muted);font-size:12px">Eigenwoningforfait ${pct(NORM.ewf*100,2)} van WOZ (${eur(ewf)} p.j.), aftrek tegen ${pct(tax*100,2)}. Indicatief, zonder Wet Hillen en heffingskortingen.</td></tr>`;
+  m+=`<tr><td colspan="4" style="text-align:left;color:var(--muted);font-size:12px">Eigenwoningforfait ${pct(NORM.ewf*100,2)} van WOZ (${eur(ewf)} p.j.), rente-aftrek tegen ${pct(tax*100,2)}, forfait belast tegen ${pct(taxEwf*100,2)}. Indicatief, zonder heffingskortingen.</td></tr>`;
   $('i_maand').innerHTML=m;
 
   // Ingroeipad
@@ -489,7 +495,8 @@ function calcIngroei(){
       const ok = fin==='e' || nieuwA <= mhY.max;
       if(fin==='a') extraA.push({jaar:y, bedrag:koop+ADMIN});
       const restLoop = 30-y;
-      const lastNieuw = (fin==='a'? (koop+ADMIN)*annF(rente, restLoop*12):0);
+      const s0 = fin==='a'? schema(koop+ADMIN, rente, restLoop, afl)[0] : null;
+      const lastNieuw = s0? (s0.rente+s0.aflossing)/12 : 0;
       padRows+=`<tr${!ok?' style="background:var(--bad-l)"':''}><td>Jaar ${y}</td><td>${eur(Wy)}</td><td>${eur(claim)}</td><td>${pct(frac*100,1)} → ${pct(nieuwFrac*100,1)}</td><td>${eur(koop)}</td><td>${markt>=bod?'<span class="tag n">markt</span>':'<span class="tag">bodem</span>'}</td><td>${fin==='a'?eur(lastNieuw):'—'}</td><td>${eur(nieuwA)}</td><td>${ok?'✓':'✕ toets'}</td></tr>`;
       frac=nieuwFrac; restBHoofd=nieuwHoofd;
       if(frac<1e-6){ frac=0; }
@@ -525,7 +532,10 @@ function calcOpname(){
 
   // Normtoets bestaande lening
   const mh = maxHypotheek({inkomen, aow, alleenstaand:single, rente:rr, rvp, label:'E, F, G', ebv:0});
-  const werkelijk = afl==='avr' ? RS*rr/100/12 : (RS>0? RS*annF(rr,360):0);
+  const loop=+$('o_loop').value;
+  const rsSch = afl==='ann' ? schema(RS, rr, loop, 'ann') : null;
+  const rsAt = t => !rsSch || t<=0 ? RS : (t>=loop ? 0 : rsSch[t-1].saldo);
+  const werkelijk = afl==='avr' ? RS*rr/100/12 : (RS>0? RS*annF(rr,loop*12):0);
   const okAnn = RS <= mh.max + 0.5;
   const okWerk = werkelijk <= mh.maxLast + 0.5;
   const totaal = RS + O, ltv = W>0? totaal/W : 0;
@@ -535,9 +545,9 @@ function calcOpname(){
   const avrOk = afl!=='avr' || RS <= W*NORM.nhg.avrMaxLtv;
 
   // Vordering per jaar
-  const claimAt = t => { const Wt=W*Math.pow(1+g,t); const raw=Math.max(share*Wt, O*Math.pow(1+bodem,t)); const cap=Math.max(0,Wt-RS); return {Wt, markt:share*Wt, bod:O*Math.pow(1+bodem,t), raw, claim:Math.min(raw,cap), capped: raw>cap}; };
+  const claimAt = t => { const Wt=W*Math.pow(1+g,t); const raw=Math.max(share*Wt, O*Math.pow(1+bodem,t)); const rs=rsAt(t); const cap=Math.max(0,Wt-rs); return {Wt, rs, markt:share*Wt, bod:O*Math.pow(1+bodem,t), raw, claim:Math.min(raw,cap), capped: raw>cap}; };
   const c=claimAt(H);
-  const netto = Math.max(0, c.Wt - c.claim - RS);
+  const netto = Math.max(0, c.Wt - c.claim - c.rs);
   const effR = O>0 && H>0 ? (Math.pow(c.claim/O,1/H)-1)*100 : 0;
 
   $('o_kpis').innerHTML =
@@ -565,17 +575,17 @@ function calcOpname(){
     <tr><td>Aandeel bank × waarde (${pct(share*100,1)})</td><td>${eur(c.markt)}</td></tr>
     <tr><td>Bodem: ${eur(O)} × (1 + ${pct(bodem*100,2)})<sup>${H}</sup></td><td>${eur(c.bod)}</td></tr>
     <tr class="hl"><td>Afdracht bank ${c.capped?'(begrensd door restschuldgarantie)':c.markt>=c.bod?'(markt)':'(bodem)'}</td><td>${eur(c.claim)}</td></tr>
-    <tr><td>Aflossing restschuld</td><td>${eur(-Math.min(RS,c.Wt))}</td></tr>
+    <tr><td>Aflossing restschuld</td><td>${eur(-Math.min(c.rs,c.Wt))}</td></tr>
     <tr class="tot"><td>Netto voor u / erfgenamen</td><td>${eur(netto)}</td></tr>`;
 
   const hs=[5,10,15,20,25,30]; if(!hs.includes(H)) hs.push(H); hs.sort((a,b)=>a-b);
   let e=`<tr><th>Horizon</th><th>Leeftijd</th><th>Woningwaarde</th><th>Markt-aandeel</th><th>Bodem</th><th>Afdracht bank</th><th>Netto u/erfgen.</th><th>Rendement bank</th></tr>`;
-  hs.forEach(h=>{ const x=claimAt(h); const n=Math.max(0,x.Wt-x.claim-RS); const r=O>0?(Math.pow(x.claim/O,1/h)-1)*100:0;
+  hs.forEach(h=>{ const x=claimAt(h); const n=Math.max(0,x.Wt-x.claim-x.rs); const r=O>0?(Math.pow(x.claim/O,1/h)-1)*100:0;
     e+=`<tr${h===H?' class="hl"':''}><td>${h} jaar</td><td>${age+h}</td><td>${eur(x.Wt)}</td><td>${eur(x.markt)}</td><td>${eur(x.bod)}</td><td>${eur(x.claim)}${x.capped?' <span class="tag">garantie</span>':''}</td><td>${eur(n)}</td><td>${pct(r,2)}</td></tr>`; });
   $('o_exit').innerHTML=e;
 
   const lab=[],sw=[],sc=[],so=[],srs=[];
-  for(let t=0;t<=30;t++){ const x=claimAt(t); lab.push('jr '+t); sw.push(x.Wt); sc.push(x.claim); so.push(Math.min(O*Math.pow(1+opeetR,t), Math.max(0,x.Wt-RS))); srs.push(RS); }
+  for(let t=0;t<=30;t++){ const x=claimAt(t); lab.push('jr '+t); sw.push(x.Wt); sc.push(x.claim); so.push(Math.min(O*Math.pow(1+opeetR,t), Math.max(0,x.Wt-x.rs))); srs.push(x.rs); }
   lineChart('o_chart','o_leg',lab,[
     {name:'Woningwaarde', color:'#253659', data:sw, fill:true},
     {name:'Vordering opnamehypotheek', color:'#F6A21D', data:sc, w:3},
@@ -584,7 +594,7 @@ function calcOpname(){
   ], kEur);
 
   let v=`<tr><th>Horizon</th><th>Opname: vordering</th><th>Opeet: vordering</th><th>Opname: netto erfgen.</th><th>Opeet: netto erfgen.</th><th>Verschil</th></tr>`;
-  hs.forEach(h=>{ const x=claimAt(h); const op=O*Math.pow(1+opeetR,h); const n1=Math.max(0,x.Wt-x.claim-RS), n2=Math.max(0,x.Wt-op-RS);
+  hs.forEach(h=>{ const x=claimAt(h); const op=O*Math.pow(1+opeetR,h); const n1=Math.max(0,x.Wt-x.claim-x.rs), n2=Math.max(0,x.Wt-op-x.rs);
     v+=`<tr${h===H?' class="hl"':''}><td>${h} jaar</td><td>${eur(x.claim)}</td><td>${eur(op)}</td><td>${eur(n1)}</td><td>${eur(n2)}</td><td>${eur(n1-n2)}</td></tr>`; });
   v+=`<tr><td colspan="6" style="text-align:left;color:var(--muted);font-size:12px">Opeethypotheek: rente ${pct(opeetR*100,2)} jaarlijks bijgeschreven, netto erfgenamen ondergrens € 0. Bij hoge waardestijging kan de opnamehypotheek duurder uitvallen dan de bodem (aandeel × waarde).</td></tr>`;
   $('o_verg').innerHTML=v;
@@ -638,6 +648,7 @@ function printPanel(){
 function init(){
   const lbl=$('i_label'); Object.keys(NORM.labelBedrag).forEach(k=>lbl.add(new Option(k,k))); lbl.value='C, D';
   const oh=$('o_h'); for(let i=1;i<=30;i++) oh.add(new Option(i+' jaar', i)); oh.value='12';
+  const ol=$('o_loop'); for(let i=1;i<=30;i++) ol.add(new Option(i+' jr', i)); ol.value='20';
   document.querySelectorAll('input.e').forEach(el=>{ fmtEurInput(el); el.setAttribute('inputmode','numeric');
     el.addEventListener('blur',()=>fmtEurInput(el));
     el.addEventListener('focus',()=>{ el.select(); }); });
