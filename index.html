@@ -240,6 +240,56 @@ a.btn{text-decoration:none;display:inline-block;padding:10px 16px;font-size:13px
 }
 @media (max-width:1050px) and (min-width:761px){.facts{grid-template-columns:1fr 1fr}}
 
+
+/* ===== desktop rekentool ===== */
+.card .sum{display:none}
+.hero2{display:grid;grid-template-columns:1fr 290px;background:#fff;border-radius:14px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+.hero2 .h-main{padding:18px 20px}
+.verdict{display:inline-block;font-weight:800;font-size:15px;padding:6px 12px;border-radius:20px;margin-bottom:8px}
+.verdict.ok{background:var(--ok-l);color:var(--ok)}.verdict.bad{background:var(--bad-l);color:var(--bad)}
+.h-sub{color:var(--muted);font-size:13px;margin-bottom:12px}.h-sub b{color:var(--text)}
+.hbar{display:flex;height:38px;border-radius:9px;overflow:hidden;font-weight:800;font-size:12.5px}
+.hbar div{display:flex;align-items:center;justify-content:center;color:#fff;white-space:nowrap;overflow:hidden;transition:width .35s}
+.hbar span{padding:0 8px;overflow:hidden;text-overflow:ellipsis}
+.hbar .a{background:var(--navy)}.hbar .b{background:var(--orange);color:var(--navy-3)}.hbar .c{background:#8fa2c4}
+.h-leg{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:8px}
+.h-leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.h-leg i.a{background:var(--navy)}.h-leg i.b{background:var(--orange)}.h-leg i.c{background:#8fa2c4}
+.hero2 .h-side{background:linear-gradient(135deg,var(--navy),var(--navy-2));color:#fff;padding:18px 20px;display:flex;flex-direction:column;justify-content:center}
+.hero2.op .h-side{background:linear-gradient(135deg,var(--orange-d),var(--orange));color:var(--navy-3)}
+.h-side .k{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;opacity:.75}
+.h-side .v{font-size:34px;font-weight:800;line-height:1.1;margin:4px 0;font-variant-numeric:tabular-nums}
+.h-side .s{font-size:12.5px;opacity:.85}
+.rnav{display:flex;gap:6px;flex-wrap:wrap;position:sticky;top:64px;z-index:20;background:var(--bg);padding:8px 0 10px;margin-bottom:6px}
+.rnav button{border:1.5px solid var(--line);background:#fff;color:var(--navy);font:600 12.5px/1 inherit;padding:8px 13px;border-radius:20px;cursor:pointer}
+.rnav button:hover{border-color:var(--navy-2)}
+.rnav button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.checks.cols{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#i_s_last{grid-template-columns:1fr;gap:0}
+.aand{display:grid;gap:10px}.ap{background:#f3f5f9;border-radius:10px;padding:10px 12px;font-size:13px}.ap b{display:block;color:var(--navy);margin-bottom:2px}
+input.rng{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:4px;margin:10px 0 2px;background:linear-gradient(90deg,var(--orange) var(--p,50%),#dde3ec var(--p,50%));outline:none;cursor:pointer}
+input.rng::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--navy);box-shadow:0 1px 4px rgba(0,0,0,.2)}
+input.rng::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid var(--navy)}
+.chart{position:relative}
+.cguide{display:none;position:absolute;top:14px;bottom:34px;width:1px;background:var(--orange-d);pointer-events:none}
+.ctip{display:none;position:absolute;top:18px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 18px rgba(20,32,60,.15);padding:8px 10px;font-size:12px;pointer-events:none;min-width:200px;z-index:3}
+.ctip b{display:block;color:var(--navy);margin-bottom:4px}
+.ctip div{display:flex;align-items:center;gap:6px;color:var(--muted);margin:2px 0}
+.ctip div span{margin-left:auto;color:var(--text);font-weight:700;font-variant-numeric:tabular-nums}
+.ctip i{width:10px;height:3px;border-radius:2px;display:inline-block}
+table.t tr:not(.hl):not(.tot):hover td{background:#f7f9fc}
+@media (min-width:1051px){
+  .grid .inp{position:sticky;top:76px;max-height:calc(100vh - 88px);overflow-y:auto;padding-right:6px;scrollbar-width:thin;scrollbar-color:#c9d2e0 transparent}
+  .grid .inp::-webkit-scrollbar{width:6px}.grid .inp::-webkit-scrollbar-thumb{background:#c9d2e0;border-radius:4px}
+  .grid{grid-template-columns:390px 1fr}
+}
+@media (max-width:1050px){.hero2{grid-template-columns:1fr}#i_s_last{grid-template-columns:1fr}}
+@media (max-width:760px){
+  .rnav{display:none}.checks.cols{grid-template-columns:1fr}
+  .card.acc.closed .sum{display:inline}
+  .hero2 .h-main,.hero2 .h-side{padding:14px}.h-side .v{font-size:28px}.verdict{font-size:13px}
+}
+
 /* ===== mobiele rekentool ===== */
 .mtabs,.mbar{display:none}
 @media (max-width:760px){
@@ -347,13 +397,13 @@ a.btn{text-decoration:none;display:inline-block;padding:10px 16px;font-size:13px
         <div class="fg"><label>Marktwaarde / koopsom woning</label><div class="eur"><input type="text" class="e" id="i_w" value="450000"></div></div>
         <div class="row2">
           <div class="fg"><label>Eigen inbreng</label><div class="eur"><input type="text" class="e" id="i_eigen" value="0"></div></div>
-          <div class="fg"><label>B-deel (% waarde)</label><div class="pctw"><input type="number" id="i_bpct" value="20" min="0" max="40" step="1"></div></div>
+          <div class="fg"><label>B-deel (% waarde)</label><div class="pctw"><input type="number" id="i_bpct" value="20" min="0" max="40" step="1"></div><input type="range" class="rng" data-for="i_bpct" min="0" max="40" step="1" aria-label="B-deel schuifregelaar"></div>
         </div>
         <div class="row2">
           <div class="fg"><label>Energielabel</label><select id="i_label"></select></div>
           <div class="fg"><label>Energiebesparing (EBV)</label><div class="eur"><input type="text" class="e" id="i_ebv" value="0"></div></div>
         </div>
-        <div class="fg"><label>Verwachte waardestijging p.j.</label><div class="pctw"><input type="number" id="i_g" value="3" step="0.25"></div></div>
+        <div class="fg"><label>Verwachte waardestijging p.j.</label><div class="pctw"><input type="number" id="i_g" value="3" step="0.25"></div><input type="range" class="rng" data-for="i_g" min="-2" max="8" step="0.25" aria-label="Waardestijging schuifregelaar"></div>
       </div></div>
 
       <div class="card"><h2>A-deel</h2><div class="bd">
@@ -390,16 +440,18 @@ a.btn{text-decoration:none;display:inline-block;padding:10px 16px;font-size:13px
     </div>
 
     <div class="res" id="i_res">
+      <div class="hero2" id="i_hero"></div>
       <div class="kpis" id="i_kpis"></div>
-      <div class="two">
-        <div class="card"><h2><span>Toetsing Trhk 2027 &amp; NHG 2027</span></h2><div class="bd"><div class="checks" id="i_checks"></div></div></div>
-        <div class="card"><h2>Maximale hypotheek op inkomen</h2><div class="bd np"><table class="t" id="i_maxtbl"></table></div></div>
-      </div>
+      <div class="rnav" data-p="i"><button data-t="i_s_toets">Toetsing</button><button data-t="i_s_last">Maximale hypotheek &amp; maandlasten</button><button data-t="i_s_chart">Grafiek</button><button data-t="i_s_pad">Ingroeipad</button></div>
+      <div class="card" id="i_s_toets"><h2><span>Toetsing Trhk 2027 &amp; NHG 2027</span></h2><div class="bd"><div class="checks cols" id="i_checks"></div></div></div>
       <div class="box afm" id="i_afm"></div>
-      <div class="card"><h2>Maandlasten jaar 1</h2><div class="bd np"><table class="t" id="i_maand"></table></div></div>
-      <div class="card"><h2>Woningwaarde, A-deel en B-deel in de tijd</h2><div class="chart" id="i_chart"></div><div class="legend" id="i_leg"></div></div>
+      <div class="two" id="i_s_last">
+        <div class="card"><h2>Maximale hypotheek op inkomen</h2><div class="bd np"><table class="t" id="i_maxtbl"></table></div></div>
+        <div class="card"><h2>Maandlasten jaar 1</h2><div class="bd np"><table class="t" id="i_maand"></table></div></div>
+      </div>
+      <div class="card" id="i_s_chart"><h2>Woningwaarde, A-deel en B-deel in de tijd</h2><div class="chart" id="i_chart"></div><div class="legend" id="i_leg"></div></div>
 
-      <div class="card"><h2 class="or">Ingroeipad — B-deel overnemen <span class="tag n">elke 2 jaar · min. € 20.000 · € 1.000 kosten</span></h2><div class="bd">
+      <div class="card" id="i_s_pad"><h2 class="or">Ingroeipad — B-deel overnemen <span class="tag n">elke 2 jaar · min. € 20.000 · € 1.000 kosten</span></h2><div class="bd">
         <div class="row3" style="margin-bottom:10px">
           <div class="fg"><label>Overname per stap</label><div class="eur"><input type="text" class="e" id="i_stap" value="25000"></div></div>
           <div class="fg"><label>Eerste stap in jaar</label><select id="i_start"><option>2</option><option>4</option><option>6</option><option>8</option><option>10</option></select></div>
@@ -425,12 +477,12 @@ a.btn{text-decoration:none;display:inline-block;padding:10px 16px;font-size:13px
       <div class="card"><h2 class="or">Woning &amp; opname</h2><div class="bd">
         <div class="fg"><label>Marktwaarde woning</label><div class="eur"><input type="text" class="e" id="o_w" value="550000"></div></div>
         <div class="row2">
-          <div class="fg"><label>Leeftijd jongste</label><input type="number" id="o_age" value="72" min="55" max="95"></div>
+          <div class="fg"><label>Leeftijd jongste</label><input type="number" id="o_age" value="72" min="55" max="95"><input type="range" class="rng" data-for="o_age" min="55" max="95" step="1" aria-label="Leeftijd schuifregelaar"></div>
           <div class="fg"><label>Gewenste opname</label><div class="eur"><input type="text" class="e" id="o_opn" value="110000"></div></div>
         </div>
         <div class="fg" id="o_staffelinfo" style="font-size:12.5px"></div>
         <div class="row2">
-          <div class="fg"><label>Waardestijging p.j.</label><div class="pctw"><input type="number" id="o_g" value="3" step="0.25"></div></div>
+          <div class="fg"><label>Waardestijging p.j.</label><div class="pctw"><input type="number" id="o_g" value="3" step="0.25"></div><input type="range" class="rng" data-for="o_g" min="-2" max="8" step="0.25" aria-label="Waardestijging schuifregelaar"></div>
           <div class="fg"><label>Verwachte woonduur</label><select id="o_h"></select></div>
         </div>
         <div class="row3">
@@ -463,20 +515,22 @@ a.btn{text-decoration:none;display:inline-block;padding:10px 16px;font-size:13px
     </div>
 
     <div class="res" id="o_res">
+      <div class="hero2 op" id="o_hero"></div>
       <div class="kpis" id="o_kpis"></div>
-      <div class="two">
-        <div class="card"><h2><span>Toetsing Trhk 2027 &amp; NHG 2027</span></h2><div class="bd"><div class="checks" id="o_checks"></div></div></div>
-        <div class="card"><h2>Bij vertrek na <span id="o_hlbl"></span></h2><div class="bd np"><table class="t" id="o_exit1"></table></div></div>
-      </div>
+      <div class="rnav" data-p="o"><button data-t="o_s_toets">Toetsing</button><button data-t="o_s_exit">Bij vertrek</button><button data-t="o_s_scen">Scenario's</button><button data-t="o_s_chart">Grafiek</button><button data-t="o_s_verg">Vergelijking</button></div>
+      <div class="card" id="o_s_toets"><h2><span>Toetsing Trhk 2027 &amp; NHG 2027</span></h2><div class="bd"><div class="checks cols" id="o_checks"></div></div></div>
       <div class="box afm" id="o_afm"></div>
-      <div class="card"><h2 class="or">Exit-scenario's per horizon</h2><div class="bd np scroll"><table class="t" id="o_exit"></table></div></div>
-      <div class="card"><h2>Woningwaarde en vordering in de tijd</h2><div class="chart" id="o_chart"></div><div class="legend" id="o_leg"></div></div>
-      <div class="card"><h2>Vergelijking: opnamehypotheek vs. opeethypotheek</h2><div class="bd np scroll"><table class="t" id="o_verg"></table></div></div>
-      <div class="box info"><b>Aandachtspunten</b><br>
-        • Het opgenomen bedrag telt mee als vermogen (box 3, Wlz-/zorgtoeslag-vermogenstoets).<br>
-        • Bespreek met erfgenamen dat de woningopbrengst wordt gedeeld met de geldverstrekker.<br>
-        • Restschuldgarantie is voorwaardelijk: behoorlijk onderhoud, verzekering, geen verhuur of bezwaring zonder toestemming, marktconforme verkoop.
+      <div class="two" id="o_s_exit">
+        <div class="card"><h2>Bij vertrek na <span id="o_hlbl"></span></h2><div class="bd np"><table class="t" id="o_exit1"></table></div></div>
+        <div class="card"><h2>Aandachtspunten</h2><div class="bd aand">
+          <div class="ap"><b>Vermogen</b>Het opgenomen bedrag telt mee als vermogen (box 3, eigen bijdrage Wlz, zorgtoeslag).</div>
+          <div class="ap"><b>Erfgenamen</b>De woningopbrengst wordt gedeeld met de geldverstrekker; bespreek dit met de familie.</div>
+          <div class="ap"><b>Restschuldgarantie</b>Voorwaardelijk: behoorlijk onderhoud, verzekering, geen verhuur of bezwaring zonder toestemming, marktconforme verkoop.</div>
+        </div></div>
       </div>
+      <div class="card" id="o_s_scen"><h2 class="or">Exit-scenario's per horizon</h2><div class="bd np scroll"><table class="t" id="o_exit"></table></div></div>
+      <div class="card" id="o_s_chart"><h2>Woningwaarde en vordering in de tijd</h2><div class="chart" id="o_chart"></div><div class="legend" id="o_leg"></div></div>
+      <div class="card" id="o_s_verg"><h2>Vergelijking: opnamehypotheek vs. opeethypotheek</h2><div class="bd np scroll"><table class="t" id="o_verg"></table></div></div>
     </div>
   </div>
 </section>
@@ -621,7 +675,18 @@ function lineChart(elId, legId, labels, series, fmt){
   series.forEach(s=>{ const pts=s.data.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
     if(s.fill) g+=`<polygon points="${x(0)},${y(0)} ${pts} ${x(s.data.length-1)},${y(0)}" fill="${s.color}" opacity=".12"/>`;
     g+=`<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="${s.w||2.5}" ${s.dash?'stroke-dasharray="6 4"':''} stroke-linejoin="round"/>`; });
-  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img">${g}</svg>`;
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img">${g}</svg><div class="cguide"></div><div class="ctip"></div>`;
+  el._cd = {labels, series, W, L, R};
+  if(!el._tipBound){ el._tipBound=true;
+    const move = ev => { const d=el._cd; const r=el.getBoundingClientRect(); const cx=(ev.touches?ev.touches[0].clientX:ev.clientX)-r.left;
+      const vx=cx/r.width*d.W; const n=d.labels.length; let i=Math.round((vx-d.L)/(d.W-d.L-d.R)*(n-1)); i=Math.max(0,Math.min(n-1,i));
+      const px=(d.L+(d.W-d.L-d.R)*i/Math.max(1,n-1))/d.W*r.width;
+      const gd=el.querySelector('.cguide'), tp=el.querySelector('.ctip'); gd.style.display='block'; gd.style.left=px+'px';
+      tp.innerHTML=`<b>${d.labels[i].replace('jr ','Jaar ')}</b>`+d.series.map(s=>`<div><i style="background:${s.color}"></i>${esc(s.name)}<span>${eur(s.data[i])}</span></div>`).join('');
+      tp.style.display='block'; const tw=tp.offsetWidth; tp.style.left=(px+tw+16>r.width? px-tw-12 : px+12)+'px'; };
+    const out = () => { el.querySelector('.cguide').style.display='none'; el.querySelector('.ctip').style.display='none'; };
+    el.addEventListener('mousemove',move); el.addEventListener('mouseleave',out); el.addEventListener('touchmove',move,{passive:true}); el.addEventListener('touchend',out);
+  }
   $(legId).innerHTML = series.map(s=>`<span><i style="background:${s.color}"></i>${esc(s.name)}</span>`).join('');
 }
 function niceMax(v){ const p=Math.pow(10,Math.floor(Math.log10(v))); const m=v/p; return (m<=1?1:m<=2?2:m<=2.5?2.5:m<=5?5:10)*p; }
@@ -676,9 +741,15 @@ function calcIngroei(){
   $('i_kpis').innerHTML =
     kpi('A-deel (lening)', eur(A), pct(A/W*100,1)+' van marktwaarde') +
     kpi('B-deel (participatie)', eur(B), pct(bpct*100,0)+' · geen maandlast', true) +
-    kpi('Netto maandlast', eur(nettoM), 'Bruto '+eur(brutoM)+' · jaar 1') +
+    kpi('B-deel na 10 jaar', eur(Math.max(bpct*W*Math.pow(1+g,10), B*Math.pow(1+bodem,10))), 'afrekening bij overname of verkoop', true) +
     kpi('Max. hypotheek inkomen', eur(mh.max), 'Financieringslast '+pct(mh.flp,1)+' · toets '+pct(tr,2));
 
+  const pctA=(1-bpct)*100;
+  $('i_hero').innerHTML = `<div class="h-main"><div class="verdict ${okA&&okLtv?'ok':'bad'}">${okA&&okLtv?'✓ Deze woning past met de Ingroeihypotheek':'✕ Deze woning past niet binnen de normen'}</div>
+    <div class="h-sub">Woningwaarde <b>${eur(W)}</b> · A-deel <b>${eur(A)}</b> · B-deel <b>${eur(B)}</b>${okA?'':' · A-deel '+eur(A-mh.max)+' boven het maximum'}</div>
+    <div class="hbar"><div class="a" style="width:${pctA}%"><span>A-deel ${pct(pctA,0)}</span></div><div class="b" style="width:${Math.max(bpct*100,8)}%"><span>B ${pct(bpct*100,0)}</span></div></div>
+    <div class="h-leg"><span><i class="a"></i>Gewone hypotheek · rente + aflossing</span><span><i class="b"></i>Geldverstrekker deelt mee · geen maandlast</span></div></div>
+    <div class="h-side"><div class="k">Netto maandlast</div><div class="v">${eur(nettoM)}</div><div class="s">bruto ${eur(brutoM)} · ${eur(regNetto-nettoM)} lager dan een gewone hypotheek</div></div>`;
   let c='';
   c+=check(okA?'ok':'bad','Inkomenstoets A-deel (Trhk art. 3)',eur(mh.max-A), okA?'Ruimte t.o.v. maximale hypotheek':'A-deel hoger dan maximale hypotheek', false);
   c+=check(okAB?'ok':'warn','Inkomenstoets A + B (totaal hypothecair krediet)',eur(mh.max-totaal), okAB?'Ook bij strikte toetsing over A + B past de lening':'Past niet als het B-deel als hypothecair krediet meetelt in de toetslast', !okAB);
@@ -800,11 +871,17 @@ function calcOpname(){
   const effK = O>0 && H>0 ? (Math.pow(c.claim/(O*(1-prem)),1/H)-1)*100 : 0; // t.o.v. netto uitkering (kosten klant incl. premie)
 
   $('o_kpis').innerHTML =
-    kpi('Uitkering netto', eur(O*(1-prem)), 'Bruto '+eur(O)+' · eenmalig', true) +
+    kpi('Maximaal opneembaar', eur(spMax), sp+'% bij '+age+' jaar (staffel)', true) +
     kpi('Aandeel bank', pct(share*100,1), 'van woningwaarde') +
     kpi('Vordering na '+H+' jr', eur(c.claim), 'Kosten voor u: '+pct(effK,2)+' p.j. (o.b.v. netto uitkering)') +
     kpi('Netto voor u/erfgenamen', eur(netto), 'na '+H+' jaar, na aflossing restschuld');
 
+  const okO = okStaffel && okLtv;
+  $('o_hero').innerHTML = `<div class="h-main"><div class="verdict ${okO?'ok':'bad'}">${okO?'✓ Opname van '+eur(O)+' is mogelijk':'✕ Opname van '+eur(O)+' past niet binnen de voorwaarden'}</div>
+    <div class="h-sub">Woningwaarde <b>${eur(W)}</b> · bestaande hypotheek <b>${eur(RS)}</b> · leeftijd jongste <b>${age} jaar</b></div>
+    <div class="hbar"><div class="c" style="width:${Math.max(RS/W*100,6)}%" title="Bestaande hypotheek ${eur(RS)}"><span>${RS/W>0.25?'Hypotheek '+eur(RS):''}</span></div><div class="b" style="width:${Math.max(O/W*100,8)}%" title="Opname ${eur(O)}"><span>${O/W>0.25?'Opname '+eur(O):''}</span></div><div class="a" style="width:${Math.max((W-RS-O)/W*100,6)}%"><span>${(W-RS-O)/W>0.25?'Vrij '+eur(Math.max(0,W-RS-O)):''}</span></div></div>
+    <div class="h-leg"><span><i class="c"></i>Bestaande hypotheek ${eur(RS)}</span><span><i class="b"></i>Opname ${eur(O)} (${pct(share*100,1)} aandeel)</span><span><i class="a"></i>Blijft vrij ${eur(Math.max(0,W-RS-O))}</span></div></div>
+    <div class="h-side"><div class="k">Netto uitkering</div><div class="v">${eur(O*(1-prem))}</div><div class="s">afrekening na ${H} jaar ${eur(c.claim)} · kosten ${pct(effK,2)} p.j.</div></div>`;
   let k='';
   k+=check(okStaffel?'ok':'bad','Leeftijdsstaffel ('+sp+'% bij '+age+' jaar)', eur(spMax-O), okStaffel?'Ruimte binnen staffel':'Opname te hoog', false);
   k+=check(okLtv?'ok':'bad','Loan-to-value ≤ 100% (restschuld + opname)', pct(ltv*100,1), eur(totaal)+' t.o.v. '+eur(W), false);
@@ -1205,6 +1282,18 @@ function cardSum(card){
   return parts.join(' · ');
 }
 function updSums(){ document.querySelectorAll('.card.acc').forEach(c=>{ const s=c.querySelector('.sum'); if(s) s.textContent=cardSum(c); }); }
+function initDesk(){
+  document.querySelectorAll('input.rng').forEach(r=>{ const tgt=$(r.dataset.for);
+    const paint=()=>{ const p=(r.value-r.min)/(r.max-r.min)*100; r.style.setProperty('--p',p+'%'); };
+    r.value=tgt.value; paint();
+    r.addEventListener('input',()=>{ tgt.value=r.value; paint(); tgt.dispatchEvent(new Event('input')); });
+    tgt.addEventListener('input',()=>{ if(document.activeElement!==r){ r.value=tgt.value; paint(); } }); });
+  document.querySelectorAll('.rnav button').forEach(b=>b.addEventListener('click',()=>{ const el=$(b.dataset.t); const y=el.getBoundingClientRect().top+window.scrollY-130; window.scrollTo({top:y,behavior:'smooth'}); }));
+  const secs=[...document.querySelectorAll('.rnav button')].map(b=>({b, el:$(b.dataset.t)}));
+  window.addEventListener('scroll',()=>{ const nav=document.querySelector('.panel.on .rnav'); if(!nav) return;
+    let cur=null; secs.filter(s=>nav.contains(s.b)).forEach(s=>{ if(s.el.getBoundingClientRect().top<160) cur=s.b; });
+    nav.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===cur)); },{passive:true});
+}
 function initMobile(){
   const closedByDefault = {i_inp:[3], o_inp:[1,2]};
   ['i_inp','o_inp'].forEach(id=>{
@@ -1230,7 +1319,7 @@ function init(){
   document.querySelectorAll('#p-normen input,#p-normen select').forEach(el=>el.addEventListener('input',calcNormen));
   window.addEventListener('hashchange',route);
   document.addEventListener('keydown',e=>{ const d=activeDeck(); if(!d||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return; if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ e.preventDefault(); d.go(1);} if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); d.go(-1);} });
-  initMobile(); refreshAll(); route();
+  initMobile(); initDesk(); refreshAll(); route();
 }
 init();
 </script>
