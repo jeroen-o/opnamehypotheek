@@ -24,7 +24,7 @@ h1,h2,h3{line-height:1.25}
 .menu a:hover{color:#fff}
 .menu a.on{color:#fff;border-bottom-color:var(--orange)}
 .menu a.pres{color:var(--orange)}.menu a.pres.on{color:#fff}
-.burger{display:none;margin-left:auto;background:none;border:1.5px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;font-size:20px;line-height:1;padding:6px 10px;cursor:pointer}
+.burger{display:none;margin-left:auto;background:none;border:1.5px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;font-size:20px;line-height:1;padding:9px 12px;min-width:44px;min-height:42px;cursor:pointer}
 @media (max-width:980px){
   .burger{display:block}
   .menu{display:none;position:absolute;left:0;right:0;top:64px;background:var(--navy-3);flex-direction:column;padding:6px 0;box-shadow:0 8px 18px rgba(0,0,0,.25)}
@@ -290,6 +290,40 @@ table.t tr:not(.hl):not(.tot):hover td{background:#f7f9fc}
   .hero2 .h-main,.hero2 .h-side{padding:14px}.h-side .v{font-size:28px}.verdict{font-size:13px}
 }
 
+
+/* ===== mobiel finetuning ===== */
+.box.afm details summary{cursor:pointer;list-style:none}
+.box.afm details summary::-webkit-details-marker{display:none}
+.box.afm details summary::after{content:" ▾ lees meer";font-size:12px;font-weight:700;color:var(--warn);white-space:nowrap}
+.box.afm details[open] summary::after{content:" ▴ minder"}
+.box.afm details[open] summary{margin-bottom:4px}
+@media (min-width:761px){.box.afm details summary::after{display:none}.box.afm details summary{pointer-events:none}.box.afm details summary b{display:inline}.box.afm .afmbody{display:inline}}
+@media (max-width:760px){
+  .facts{grid-template-columns:1fr 1fr!important;gap:10px}.fact{padding:12px}.fact .v{font-size:18px}.fact .s{font-size:11px}
+  .hero{border-radius:14px}.hero-in{padding:24px 18px}
+  .prod{padding:18px}.prod h2{font-size:19px}.prod-btns .btn{flex:1;text-align:center}
+  .ck{grid-template-columns:22px 1fr;row-gap:2px}.ck .val{grid-column:2;font-size:13px;color:var(--navy)}
+  .card h2 .tag{display:none}
+  table.rsp tr:first-child{display:none}
+  table.rsp,table.rsp tbody{display:block;width:100%}
+  table.rsp tr{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;padding:10px 12px;border-top:1px solid var(--line)}
+  table.rsp td{display:block;border:0!important;padding:0!important;text-align:left!important;background:none!important;position:static!important;font-size:13px}
+  table.rsp td:first-child{grid-column:1/-1;font-weight:800;color:var(--navy);font-size:14px;margin-bottom:2px}
+  table.rsp td[data-l]::before{content:attr(data-l);display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:var(--muted)}
+  table.rsp td.note{grid-column:1/-1;color:var(--muted);font-size:12px}
+  table.rsp tr.hl{background:var(--orange-l)}table.rsp tr.tot{border-top:2px solid var(--navy)}
+  .mbar{gap:10px;padding-left:12px;padding-right:12px}
+  .mbar .mv{flex:1 1 0}
+  .mbar .mv span,.mbar .mv b{overflow:hidden;text-overflow:ellipsis}
+}
+@media (max-width:400px){
+  .mbar .mv{flex:0 1 auto}.mbar .mv span{font-size:9.5px;max-width:110px}.mbar .mv b{font-size:15.5px;overflow:visible}
+  .mbar button{padding:12px 14px;font-size:0}.mbar button::after{content:'→';font-size:18px;font-weight:900}
+  .row2:has(select){grid-template-columns:1fr!important}
+  .kpi .v{font-size:17px}
+  .hero2 .h-side .v{font-size:26px}
+}
+
 /* ===== mobiele rekentool ===== */
 .mtabs,.mbar{display:none}
 @media (max-width:760px){
@@ -384,7 +418,7 @@ table.t tr:not(.hl):not(.tot):hover td{background:#f7f9fc}
 
 <!-- ================= INGROEIHYPOTHEEK ================= -->
 <section class="panel" id="p-ingroei">
-  <div class="mbar" id="i_mbar"><div class="mv"><span>Netto maandlast</span><b id="i_mb1">–</b></div><div class="mv"><span id="i_mb2l">Max. hypotheek</span><b id="i_mb2">–</b></div><button onclick="mView('i','res')">Resultaat →</button></div>
+  <div class="mbar" id="i_mbar"><div class="mv"><span>Netto p/m</span><b id="i_mb1">–</b></div><div class="mv"><span id="i_mb2l">Max. hyp.</span><b id="i_mb2">–</b></div><button onclick="mView('i','res')" aria-label="Naar resultaat">Resultaat →</button></div>
   <div class="intro">
     <div><h1>Ingroeihypotheek</h1>
     <p>Reguliere A-lening (rente + aflossing) plus een B-deel waarin de geldverstrekker meedeelt in de woningwaarde. Het B-deel kent geen maandlasten en kan elke 2 jaar (deels) worden overgenomen.</p></div>
@@ -465,7 +499,7 @@ table.t tr:not(.hl):not(.tot):hover td{background:#f7f9fc}
 
 <!-- ================= OPNAMEHYPOTHEEK ================= -->
 <section class="panel" id="p-opname">
-  <div class="mbar" id="o_mbar"><div class="mv"><span>Netto uitkering</span><b id="o_mb1">–</b></div><div class="mv"><span id="o_mb2l">Afrekening</span><b id="o_mb2">–</b></div><button onclick="mView('o','res')">Resultaat →</button></div>
+  <div class="mbar" id="o_mbar"><div class="mv"><span>Uitkering</span><b id="o_mb1">–</b></div><div class="mv"><span id="o_mb2l">Afrekening</span><b id="o_mb2">–</b></div><button onclick="mView('o','res')" aria-label="Naar resultaat">Resultaat →</button></div>
   <div class="intro">
     <div><h1>Opnamehypotheek</h1>
     <p>Voor senioren: eenmalig vermogen vrijmaken uit de overwaarde, zonder maandlasten. De geldverstrekker deelt mee in de woningwaarde, met een bodemvergoeding en restschuldgarantie.</p></div>
@@ -665,12 +699,12 @@ function kpi(k,v,s,o){ return `<div class="kpi${o?' o':''}"><div class="k">${k}<
 
 // SVG-lijngrafiek
 function lineChart(elId, legId, labels, series, fmt){
-  const el=$(elId); const W=760,H=300,L=78,R=14,T=14,B=34;
+  const el=$(elId); const sm=window.innerWidth<760; const W=sm?420:760,H=sm?260:300,L=sm?58:78,R=sm?10:14,T=14,B=34;
   let max=0; series.forEach(s=>s.data.forEach(v=>{ if(v>max) max=v; })); max = max>0? niceMax(max):1;
   const x=i=>L+(W-L-R)*i/Math.max(1,labels.length-1), y=v=>T+(H-T-B)*(1-v/max);
   let g='';
   for(let k=0;k<=5;k++){ const v=max*k/5, yy=y(v); g+=`<line x1="${L}" x2="${W-R}" y1="${yy}" y2="${yy}" stroke="#e5eaf2"/><text x="${L-8}" y="${yy+4}" text-anchor="end" font-size="11" fill="#66748a">${fmt(v)}</text>`; }
-  const step=Math.ceil(labels.length/12);
+  const step=Math.ceil(labels.length/(sm?6:12));
   labels.forEach((l,i)=>{ const last=labels.length-1; if(i%step===0 ? (i===last || last-i>=step/2) : i===last) g+=`<text x="${x(i)}" y="${H-12}" text-anchor="middle" font-size="11" fill="#66748a">${l}</text>`; });
   series.forEach(s=>{ const pts=s.data.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
     if(s.fill) g+=`<polygon points="${x(0)},${y(0)} ${pts} ${x(s.data.length-1)},${y(0)}" fill="${s.color}" opacity=".12"/>`;
@@ -747,7 +781,7 @@ function calcIngroei(){
   const pctA=(1-bpct)*100;
   $('i_hero').innerHTML = `<div class="h-main"><div class="verdict ${okA&&okLtv?'ok':'bad'}">${okA&&okLtv?'✓ Deze woning past met de Ingroeihypotheek':'✕ Deze woning past niet binnen de normen'}</div>
     <div class="h-sub">Woningwaarde <b>${eur(W)}</b> · A-deel <b>${eur(A)}</b> · B-deel <b>${eur(B)}</b>${okA?'':' · A-deel '+eur(A-mh.max)+' boven het maximum'}</div>
-    <div class="hbar"><div class="a" style="width:${pctA}%"><span>A-deel ${pct(pctA,0)}</span></div><div class="b" style="width:${Math.max(bpct*100,8)}%"><span>B ${pct(bpct*100,0)}</span></div></div>
+    <div class="hbar"><div class="a" style="width:${pctA}%"><span>A-deel ${pct(pctA,0)}</span></div><div class="b" style="width:${Math.max(bpct*100,8)}%"><span>${bpct>=(window.innerWidth<500?0.3:0.12)?'B '+pct(bpct*100,0):''}</span></div></div>
     <div class="h-leg"><span><i class="a"></i>Gewone hypotheek · rente + aflossing</span><span><i class="b"></i>Geldverstrekker deelt mee · geen maandlast</span></div></div>
     <div class="h-side"><div class="k">Netto maandlast</div><div class="v">${eur(nettoM)}</div><div class="s">bruto ${eur(brutoM)} · ${eur(regNetto-nettoM)} lager dan een gewone hypotheek</div></div>`;
   let c='';
@@ -774,7 +808,7 @@ function calcIngroei(){
   t+=`<tr class="hl"><td>Woningwaarde haalbaar met B-deel ${pct(bpct*100,0)} (productaanname)</td><td>${eur(bpct<1? (mh.max+eigen)/(1-bpct) : mh.max)}</td></tr>`;
   $('i_maxtbl').innerHTML=t;
 
-  $('i_afm').innerHTML = `<b>⚠ AFM/compliance — B-deel in de leencapaciteit.</b> Art. 3 Trhk toetst de financieringslast over het <i>totale</i> hypothecair krediet op annuïtaire basis. Wordt het B-deel juridisch als hypothecair krediet gekwalificeerd, dan telt het mee en is de extra koopkracht niet beschikbaar (strikte toets hierboven). De weergegeven "koopkracht met B-deel" is een <b>productaanname</b> die bevestiging door de AFM/juridische toets vereist vóór gebruik in klantuitingen. Ook het B-deel is niet kosteloos: de bodemvergoeding van ${pct(bodem*100,2)} p.j. samengesteld wordt bij overname of verkoop afgerekend.`;
+  $('i_afm').innerHTML = afmBox(`⚠ AFM/compliance — B-deel in de leencapaciteit.`, ` Art. 3 Trhk toetst de financieringslast over het <i>totale</i> hypothecair krediet op annuïtaire basis. Wordt het B-deel juridisch als hypothecair krediet gekwalificeerd, dan telt het mee en is de extra koopkracht niet beschikbaar (strikte toets hierboven). De weergegeven "koopkracht met B-deel" is een <b>productaanname</b> die bevestiging door de AFM/juridische toets vereist vóór gebruik in klantuitingen. Ook het B-deel is niet kosteloos: de bodemvergoeding van ${pct(bodem*100,2)} p.j. samengesteld wordt bij overname of verkoop afgerekend.`);
 
   // Maandlasten tabel
   let m=`<tr><th></th><th>Ingroeihypotheek (A)</th><th>Regulier (A + B)</th><th>Verschil</th></tr>`;
@@ -786,7 +820,7 @@ function calcIngroei(){
   m+=rij('Fiscaal voordeel per maand', aftrek/12, fisc(regSch.rente)/12);
   m+=`<tr class="tot"><td>Netto maandlast</td><td>${eur(nettoM)}</td><td>${eur(regNetto)}</td><td>${eur(regNetto-nettoM)}</td></tr>`;
   m+=`<tr><td colspan="4" style="text-align:left;color:var(--muted);font-size:12px">Eigenwoningforfait ${pct(NORM.ewf*100,2)} van WOZ (${eur(ewf)} p.j.), rente-aftrek tegen ${pct(tax*100,2)}, forfait belast tegen ${pct(taxEwf*100,2)}. Indicatief, zonder heffingskortingen.</td></tr>`;
-  $('i_maand').innerHTML=m;
+  $('i_maand').innerHTML=m; labelize('i_maand');
 
   // Ingroeipad
   const stap=Math.max(20000,val('i_stap')), start=+$('i_start').value, fin=$('i_fin').value;
@@ -821,7 +855,7 @@ function calcIngroei(){
     series.w.push(Wy); series.a.push(aSaldo); series.b.push(frac>0? Math.max(frac*Wy, restBHoofd*Math.pow(1+bodem,y)) : 0);
   }
   $('i_pad').innerHTML = `<tr><th>Moment</th><th>Woningwaarde</th><th>Waarde B-deel</th><th>Aandeel bank</th><th>Overname</th><th>Prijsbasis</th><th>Extra bruto/mnd</th><th>A-deel na</th><th>Toets</th></tr>` + (padRows||`<tr><td colspan="9">Geen overnames (B-deel 0%).</td></tr>`) +
-    `<tr><td colspan="9" style="text-align:left;color:var(--muted);font-size:12px">Toets per stap: A-deel na overname ≤ maximale hypotheek bij geïndexeerd inkomen (+${pct(inkg*100,1)} p.j.), huidige normen en rente. Overnameprijs = max(aandeel × woningwaarde, resterende hoofdsom × (1 + bodem)<sup>t</sup>); € ${NF0.format(ADMIN)} kosten per overname${fin==='a'?' meegefinancierd':''}.</td></tr>`;
+    `<tr><td colspan="9" style="text-align:left;color:var(--muted);font-size:12px">Toets per stap: A-deel na overname ≤ maximale hypotheek bij geïndexeerd inkomen (+${pct(inkg*100,1)} p.j.), huidige normen en rente. Overnameprijs = max(aandeel × woningwaarde, resterende hoofdsom × (1 + bodem)<sup>t</sup>); € ${NF0.format(ADMIN)} kosten per overname${fin==='a'?' meegefinancierd':''}.</td></tr>`; labelize('i_pad');
 
   $('i_mb1').textContent=eur(nettoM); const mb2=$('i_mb2'); mb2.textContent=eur(mh.max); mb2.className=okA?'ok':'bad';
   LAST.ing = {W, eigen, bpct, B, A, totaal, g, rente, rvp, afl, inkomen, single, aow, label, mh, nettoM, brutoM, regNetto, regBruto, bodem, steps:stepsArr, stap, fin, series, okA, okAB, okLtv, ltv, nhgGrens, okNhgGrens};
@@ -893,7 +927,7 @@ function calcOpname(){
   k+=check('warn','Opnamedeel (participatie) binnen NHG', 'niet standaard', 'NHG kent geen standaardregeling voor een participatie-/opnamedeel; restschuldgarantie is een productvoorwaarde, geen NHG-dekking.', true);
   $('o_checks').innerHTML=k;
 
-  $('o_afm').innerHTML = `<b>⚠ AFM/compliance — toetsing en klantcommunicatie.</b> Het opnamedeel heeft geen maandlasten, maar is wel hypothecair krediet met een uitgestelde vergoeding (minimaal ${pct(bodem*100,2)} p.j. samengesteld). Of het buiten de annuïtaire toetslast van art. 3 Trhk mag blijven, vergt juridische bevestiging (vergelijk verzilver-/opeethypotheek). Vermeld "geen maandlasten" nooit zonder de totale kosten bij vertrek; het risico op een misleidende uiting (Wft art. 4:19) is reëel. Leeftijdsstaffel en garantiepremie zijn productvoorwaarden.`;
+  $('o_afm').innerHTML = afmBox(`⚠ AFM/compliance — toetsing en klantcommunicatie.`, ` Het opnamedeel heeft geen maandlasten, maar is wel hypothecair krediet met een uitgestelde vergoeding (minimaal ${pct(bodem*100,2)} p.j. samengesteld). Of het buiten de annuïtaire toetslast van art. 3 Trhk mag blijven, vergt juridische bevestiging (vergelijk verzilver-/opeethypotheek). Vermeld "geen maandlasten" nooit zonder de totale kosten bij vertrek; het risico op een misleidende uiting (Wft art. 4:19) is reëel. Leeftijdsstaffel en garantiepremie zijn productvoorwaarden.`);
 
   $('o_hlbl').textContent = H+' jaar';
   $('o_exit1').innerHTML = `<tr><th>Onderdeel</th><th>Bedrag</th></tr>
@@ -908,11 +942,11 @@ function calcOpname(){
   let e=`<tr><th>Horizon</th><th>Leeftijd</th><th>Woningwaarde</th><th>Markt-aandeel</th><th>Bodem</th><th>Afdracht bank</th><th>Netto u/erfgen.</th><th>Rendement bank</th></tr>`;
   hs.forEach(h=>{ const x=claimAt(h); const n=Math.max(0,x.Wt-x.claim-x.rs); const r=O>0?(Math.pow(x.claim/O,1/h)-1)*100:0;
     e+=`<tr${h===H?' class="hl"':''}><td>${h} jaar</td><td>${age+h}</td><td>${eur(x.Wt)}</td><td>${eur(x.markt)}</td><td>${eur(x.bod)}</td><td>${eur(x.claim)}${x.capped?' <span class="tag">garantie</span>':''}</td><td>${eur(n)}</td><td>${pct(r,2)}</td></tr>`; });
-  $('o_exit').innerHTML=e;
+  $('o_exit').innerHTML=e; labelize('o_exit');
 
   const lab=[],sw=[],sc=[],so=[],srs=[];
   for(let t=0;t<=30;t++){ const x=claimAt(t); lab.push('jr '+t); sw.push(x.Wt); sc.push(x.claim); so.push(Math.min(O*Math.pow(1+opeetR,t), Math.max(0,x.Wt-x.rs))); srs.push(x.rs); }
-  $('o_mb1').textContent=eur(O*(1-prem)); $('o_mb2l').textContent='Afrekening na '+H+' jr'; const ob2=$('o_mb2'); ob2.textContent=eur(c.claim); ob2.className=okStaffel&&okLtv?'':'bad';
+  $('o_mb1').textContent=eur(O*(1-prem)); $('o_mb2l').textContent='Afrekening '+H+' jr'; const ob2=$('o_mb2'); ob2.textContent=eur(c.claim); ob2.className=okStaffel&&okLtv?'':'bad';
   LAST.op = {W, age, O, prem, share, sp, spMax, okStaffel, RS, rr, afl, bodem, g, H, c, netto, effR, effK, opeetR, claimAt, mh, werkelijk, okAnn, okWerk, ltv, inkomen};
   lineChart('o_chart','o_leg',lab,[
     {name:'Woningwaarde', color:'#253659', data:sw, fill:true},
@@ -925,7 +959,7 @@ function calcOpname(){
   hs.forEach(h=>{ const x=claimAt(h); const op=O*Math.pow(1+opeetR,h); const n1=Math.max(0,x.Wt-x.claim-x.rs), n2=Math.max(0,x.Wt-op-x.rs);
     v+=`<tr${h===H?' class="hl"':''}><td>${h} jaar</td><td>${eur(x.claim)}</td><td>${eur(op)}</td><td>${eur(n1)}</td><td>${eur(n2)}</td><td>${eur(n1-n2)}</td></tr>`; });
   v+=`<tr><td colspan="6" style="text-align:left;color:var(--muted);font-size:12px">Opeethypotheek: rente ${pct(opeetR*100,2)} jaarlijks bijgeschreven, netto erfgenamen ondergrens € 0. Bij hoge waardestijging kan de opnamehypotheek duurder uitvallen dan de bodem (aandeel × waarde).</td></tr>`;
-  $('o_verg').innerHTML=v;
+  $('o_verg').innerHTML=v; labelize('o_verg');
 }
 
 // =================================================================
@@ -1282,6 +1316,14 @@ function cardSum(card){
   return parts.join(' · ');
 }
 function updSums(){ document.querySelectorAll('.card.acc').forEach(c=>{ const s=c.querySelector('.sum'); if(s) s.textContent=cardSum(c); }); }
+function afmBox(title, body){
+  return `<details${MQ.matches?'':' open'}><summary><b>${title}</b></summary><div class="afmbody">${body}</div></details>`;
+}
+function labelize(id){
+  const tb=$(id); const ths=[...tb.querySelectorAll('tr:first-child th')].map(th=>th.textContent.trim());
+  tb.classList.add('rsp');
+  tb.querySelectorAll('tr').forEach((tr,ri)=>{ if(ri===0) return; [...tr.children].forEach((td,ci)=>{ if(td.colSpan>1) td.classList.add('note'); else if(ths[ci]) td.setAttribute('data-l',ths[ci]); }); });
+}
 function initDesk(){
   document.querySelectorAll('input.rng').forEach(r=>{ const tgt=$(r.dataset.for);
     const paint=()=>{ const p=(r.value-r.min)/(r.max-r.min)*100; r.style.setProperty('--p',p+'%'); };
@@ -1320,6 +1362,7 @@ function init(){
   window.addEventListener('hashchange',route);
   document.addEventListener('keydown',e=>{ const d=activeDeck(); if(!d||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return; if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ e.preventDefault(); d.go(1);} if(e.key==='ArrowLeft'||e.key==='PageUp'){ e.preventDefault(); d.go(-1);} });
   initMobile(); initDesk(); refreshAll(); route();
+  let rz; window.addEventListener('resize',()=>{ clearTimeout(rz); rz=setTimeout(()=>{ calcIngroei(); calcOpname(); },200); });
 }
 init();
 </script>
