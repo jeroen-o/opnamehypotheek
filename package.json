@@ -1,0 +1,13 @@
+{
+  "name": "opnamehypotheek",
+  "private": true,
+  "description": "WoonFixx-rekentool Ingroei- en Opnamehypotheek (normen 2027) — tests",
+  "scripts": {
+    "test": "node tests/rekentool.test.js && node tests/presentaties.test.js",
+    "test:rekentool": "node tests/rekentool.test.js",
+    "test:presentaties": "node tests/presentaties.test.js"
+  },
+  "devDependencies": {
+    "playwright": "1.49.1"
+  }
+}
