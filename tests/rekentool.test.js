@@ -29,6 +29,22 @@ const { URL_BASE, openBrowser, teller, setInput } = require('./helpers');
         }
   t.check(`Raster ${n - bad}/${n} gelijk`, bad === 0);
 
+  console.log('2b. AOW-leeftijd binnen 10 jaar — laagste van toets vóór (tabel 1) en na AOW (tabel 2)');
+  for (const [ink, na, r, rvp, single] of [[70000, 32000, 4.2, 10, false], [55000, 48000, 3.8, 20, false], [42000, 40000, 4.6, 5, true], [90000, 25000, 4.0, 10, true]]) {
+    const tool = await page.evaluate(([ink, na, r, rvp, single]) => { const m = maxHypotheekAow({ inkomen: ink, alleenstaand: single, rente: r, rvp, label: 'E, F, G', ebv: 0 }, na); return [m.max, m.bindend]; }, [ink, na, r, rvp, single]);
+    const voor = R.maxHyp({ ink, aow: false, single, rente: r, rvp }).max, naM = R.maxHyp({ ink: na, aow: true, single, rente: r, rvp }).max;
+    t.near(`  inkomen ${ink} / na AOW ${na}: maximum`, tool[0], Math.min(voor, naM));
+    t.check(`  inkomen ${ink} / na AOW ${na}: bindend ${naM < voor ? 'na' : 'voor'} AOW`, tool[1] === (naM < voor ? 'na' : 'voor'));
+  }
+  // via de invoer van de rekentool (ingroei)
+  await page.goto(URL_BASE + 'ingroeihypotheek'); await page.waitForTimeout(150);
+  for (const [id, v] of [['i_w', 450000], ['i_eigen', 0], ['i_bpct', 20], ['i_rente', 4.2], ['i_rvp', 10], ['i_label', 'E, F, G'], ['i_ink1', 70000], ['i_ink2', 0], ['i_aow', false], ['i_aow10', true], ['i_na1', 32000], ['i_na2', 0], ['i_ebv', 0]]) await setInput(page, id, v);
+  const kpiAow = await page.evaluate(() => [...document.querySelectorAll('#i_kpis .kpi .v')].map(e => e.textContent));
+  t.near('  rekentool ingroei: max. hypotheek met AOW binnen 10 jaar', R.num(kpiAow[3]), Math.min(R.maxHyp({ ink: 70000, rente: 4.2, rvp: 10 }).max, R.maxHyp({ ink: 32000, aow: true, rente: 4.2, rvp: 10 }).max));
+  t.check('  invoervelden "inkomen na AOW" zichtbaar', await page.isVisible('#i_na1'));
+  await setInput(page, 'i_aow10', false);
+  t.check('  invoervelden "inkomen na AOW" verborgen zonder vinkje', !(await page.isVisible('#i_na1')));
+
   console.log('3. Ingroeihypotheek');
   const ING = [
     { W: 450000, eig: 0, b: 20, g: 3, r: 4.2, rvp: 10, afl: 'ann', label: 'C, D', i1: 62000, i2: 30000, woz: 450000 },
