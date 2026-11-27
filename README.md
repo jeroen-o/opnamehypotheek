@@ -12,3 +12,13 @@ WoonFixx-rekentool voor de **Ingroeihypotheek** en **Opnamehypotheek** — stand
 Validatie: maximale hypotheken komen exact overeen met Nibud *Advies hypotheeknormen 2027*, tabel 3 en 4 (bijv. € 70.000 bij 4,25% → € 294.074; bij 5% → € 279.267).
 
 Indicatieve berekening; productaannames rond het B-/opnamedeel vereisen juridische/AFM-toetsing.
+
+## Tests
+Onafhankelijke narekening van rekentool en presentaties (normen 2027) staat in `tests/`. Draaien:
+
+```bash
+npm install && npx playwright install chromium
+npm test
+```
+
+Zie `tests/README.md` voor details.
