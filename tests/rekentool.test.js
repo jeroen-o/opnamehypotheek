@@ -89,6 +89,23 @@ const { URL_BASE, openBrowser, teller, setInput } = require('./helpers');
     t.near(`${pre} netto erfgenamen`, R.num(kpi[3]), Math.max(0, Wt - claim - rs));
   }
 
+  console.log('5. Afdrukken: rekenrapporten en handouts worden zonder fouten opgebouwd');
+  await page.evaluate(() => { window.__printed = []; window.open = () => { const doc = { html: '', write(h) { this.html += h; }, close() { window.__printed.push(this.html); } }; return { document: doc, focus() {}, print() {} }; }; });
+  for (const [route, knop, moet] of [
+    ['ingroeihypotheek', '#p-ingroei .intro .btn', ['Rekenrapport Ingroeihypotheek', 'Uitgangspunten', 'Toetsing aan de normen 2027', 'Ingroeipad', 'Aandachtspunten en compliance']],
+    ['opnamehypotheek', '#p-opname .intro .btn', ['Rekenrapport Opnamehypotheek', 'Uitgangspunten', 'Scenario', 'Vergelijking met de opeethypotheek', 'Aandachtspunten en compliance']],
+    ['presentatie-ingroeihypotheek', '#deck-ingroei [data-a=print]', ['Uitleg', 'Ingroeihypotheek', 'Belangrijk']],
+    ['presentatie-opnamehypotheek', '#deck-opname [data-a=print]', ['Uitleg', 'Opnamehypotheek', 'Belangrijk']],
+  ]) {
+    await page.goto(URL_BASE + route); await page.waitForTimeout(200);
+    await page.evaluate(() => { window.__printed = []; window.open = () => { const doc = { html: '', write(h) { this.html += h; }, close() { window.__printed.push(this.html); } }; return { document: doc, focus() {}, print() {} }; }; });
+    await page.click(knop); await page.waitForTimeout(150);
+    const html = await page.evaluate(() => window.__printed[0] || '');
+    const mist = moet.filter(m => !html.includes(m));
+    t.check(`  afdruk ${route}`, html.length > 2000 && mist.length === 0, mist.length ? 'ontbreekt: ' + mist.join(', ') : `${Math.round(html.length / 1024)} kB`);
+    if (route.startsWith('presentatie')) { const n = (html.match(/<h4>Uitleg<\/h4>/g) || []).length; const s = await page.evaluate(r => document.querySelectorAll('#deck-' + (r.includes('ingroei') ? 'ingroei' : 'opname') + ' .slide').length, route); t.check(`  handout ${route}: uitleg bij elke dia (${n}/${s})`, n === s); }
+  }
+
   t.check('Geen JavaScript-fouten', errors.length === 0, errors.join('; '));
   console.log(`\nRekentool: ${t.ok} geslaagd, ${t.fout} mislukt`);
   await browser.close(); process.exit(t.fout ? 1 : 0);
