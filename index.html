@@ -1069,11 +1069,128 @@ function fillNormText(){
 // =================================================================
 // UI
 // =================================================================
+// =================================================================
+// REKENRAPPORT (afdrukken rekentool)
+// =================================================================
+const RAPPORT_CSS = `
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:11pt/1.5 -apple-system,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;color:#1c2638;background:#fff}
+.r{max-width:780px;margin:0 auto;padding:18px 8px}
+.rh{display:flex;align-items:center;justify-content:space-between;background:#253659;color:#fff;border-radius:10px;padding:14px 18px;margin-bottom:14px}
+.rh img{height:26px;display:block}
+.rh .t{text-align:right}.rh .t b{display:block;font-size:14pt}.rh .t span{font-size:9pt;opacity:.8}
+h2{font-size:12.5pt;color:#253659;border-bottom:2px solid #F6A21D;padding-bottom:3px;margin:16px 0 8px}
+p{margin:0 0 6px}.uitleg{color:#44516a;font-size:10pt}
+.verdict{display:inline-block;font-weight:800;padding:4px 10px;border-radius:14px;margin-bottom:6px}
+.verdict.ok{background:#e6f5ee;color:#1a8f5c}.verdict.bad{background:#fdecee;color:#c8333f}
+.kp{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0}
+.kp div{border:1px solid #dde3ec;border-top:3px solid #253659;border-radius:8px;padding:7px 9px}
+.kp div.o{border-top-color:#F6A21D}
+.kp span{display:block;font-size:7.5pt;font-weight:700;color:#66748a;text-transform:uppercase;letter-spacing:.3px}
+.kp b{font-size:13pt;color:#253659}
+.inp{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px}
+.inp .blk{break-inside:avoid}.inp h3{font-size:9.5pt;color:#253659;margin:4px 0 2px;text-transform:uppercase;letter-spacing:.3px}
+.inp table{width:100%;border-collapse:collapse;font-size:9.5pt}
+.inp td{padding:2px 0;border-bottom:1px dotted #dde3ec}.inp td:last-child{text-align:right;font-weight:600}
+table.t{width:100%;border-collapse:collapse;font-size:9pt;font-variant-numeric:tabular-nums;margin:4px 0 6px}
+table.t th{background:#eef2f8;color:#253659;text-align:right;padding:4px 6px;font-size:8pt;text-transform:uppercase}
+table.t td{padding:4px 6px;text-align:right;border-top:1px solid #e3e8ef}
+table.t th:first-child,table.t td:first-child{text-align:left}
+table.t tr.hl td{background:#fff4e2;font-weight:700}table.t tr.tot td{font-weight:800;border-top:2px solid #253659}
+.tag{display:inline-block;font-size:7pt;font-weight:800;padding:1px 5px;border-radius:8px;background:#F6A21D;color:#1b2844}.tag.n{background:#dfe6f2;color:#253659}
+.ck{display:grid;grid-template-columns:18px 1fr auto;gap:6px;padding:5px 7px;border-radius:6px;margin-bottom:4px;font-size:9.5pt;break-inside:avoid}
+.ck .ic{width:16px;height:16px;border-radius:50%;color:#fff;font-size:8pt;font-weight:900;text-align:center;line-height:16px}
+.ck.ok{background:#e6f5ee}.ck.ok .ic{background:#1a8f5c}.ck.bad{background:#fdecee}.ck.bad .ic{background:#c8333f}.ck.warn{background:#fff6e5}.ck.warn .ic{background:#a86500}
+.ck small{display:block;color:#66748a;font-size:8.5pt}.ck .val{font-weight:700;white-space:nowrap}
+.chart{height:230px;border:1px solid #dde3ec;border-radius:8px;padding:4px}.chart svg{width:100%;height:100%}
+.legend{font-size:8.5pt;color:#66748a;margin:4px 0 6px}.legend span{margin-right:12px}.legend i{display:inline-block;width:12px;height:3px;margin-right:4px;vertical-align:middle}
+.afm{background:#fff6e5;border-left:4px solid #d9870a;border-radius:6px;padding:8px 10px;font-size:9.5pt;margin:6px 0}
+.disc{font-size:8.5pt;color:#66748a;border-top:1px solid #dde3ec;margin-top:14px;padding-top:8px}
+section{break-inside:avoid-page}
+.pb{break-before:page}
+@page{size:A4;margin:12mm}
+`;
+function rapportInvoer(pre){
+  let html='';
+  $(pre+'_inp').querySelectorAll(':scope > .card').forEach(card=>{
+    const h=card.querySelector('h2').cloneNode(true); h.querySelectorAll('.sum').forEach(s=>s.remove());
+    let rows='';
+    card.querySelectorAll('.bd .fg, .bd label.chk').forEach(el=>{
+      if(el.closest('[hidden]')) return;
+      if(el.matches('label.chk')){ const cb=el.querySelector('input'); if(cb.disabled) return; rows+=`<tr><td>${esc(el.textContent.trim())}</td><td>${cb.checked?'ja':'nee'}</td></tr>`; return; }
+      const lab=el.querySelector('label'), inp=el.querySelector('input:not(.rng),select'); if(!lab||!inp) return;
+      let v = inp.tagName==='SELECT' ? inp.options[inp.selectedIndex].text : inp.value;
+      if(inp.classList.contains('e')) v=eur(parseEur(v)); else if(inp.closest('.pctw')) v=String(v).replace('.',',')+'%';
+      rows+=`<tr><td>${esc(lab.textContent.trim())}</td><td>${esc(v)}</td></tr>`;
+    });
+    if(rows) html+=`<div class="blk"><h3>${esc(h.textContent.trim())}</h3><table>${rows}</table></div>`;
+  });
+  return `<div class="inp">${html}</div>`;
+}
+const rTbl = id => `<table class="t">${$(id).innerHTML}</table>`;
+const rChart = (cid,lid) => `<div class="chart">${$(cid).querySelector('svg').outerHTML}</div><div class="legend">${$(lid).innerHTML}</div>`;
+function rKp(items){ return `<div class="kp">${items.map(([k,v,o])=>`<div class="${o?'o':''}"><span>${k}</span><b>${v}</b></div>`).join('')}</div>`; }
+
+function rapportIngroei(){
+  const L=LAST.ing, okAll=L.okA&&L.okLtv;
+  const W10=L.W*Math.pow(1+L.g,10), afr10=Math.max(L.bpct*W10, L.B*Math.pow(1+L.bodem,10));
+  return `
+  <section><h2>1. Samenvatting</h2>
+    <div class="verdict ${okAll?'ok':'bad'}">${okAll?'✓ Deze woning past met de Ingroeihypotheek':'✕ Deze woning past niet binnen de normen'}</div>
+    ${rKp([['Woningwaarde',eur(L.W)],['A-deel (lening)',eur(L.A)],['B-deel ('+pct(L.bpct*100,0)+')',eur(L.B),1],['Netto maandlast',eur(L.nettoM)]])}
+    <p class="uitleg">De woning van ${eur(L.W)} wordt gefinancierd met een gewone hypotheek (A-deel) van ${eur(L.A)} en een B-deel van ${eur(L.B)} waarin de geldverstrekker meedeelt in de woningwaarde. Over het A-deel betaal je rente en aflossing; de netto maandlast in het eerste jaar is ${eur(L.nettoM)} (bruto ${eur(L.brutoM)}). Dat is ${eur(L.regNetto-L.nettoM)} per maand lager dan bij een gewone hypotheek voor de hele woning. Over het B-deel betaal je geen maandlasten, maar wel een vergoeding bij overname of verkoop.</p></section>
+  <section><h2>2. Uitgangspunten</h2><p class="uitleg">De berekening is gebaseerd op de volgende ingevulde gegevens.</p>${rapportInvoer('i')}</section>
+  <section><h2>3. Hoe werkt de Ingroeihypotheek?</h2>
+    <p class="uitleg"><b>A-deel:</b> een gewone hypotheek met rente en aflossing en hypotheekrenteaftrek, getoetst op inkomen en woningwaarde. <b>B-deel:</b> de geldverstrekker financiert ${pct(L.bpct*100,0)} van de woning mee en krijgt daarvoor hetzelfde aandeel in de woningwaarde. Bij overname of verkoop betaal je het hoogste van: het aandeel van de geldverstrekker in de dan geldende woningwaarde, of de oorspronkelijke hoofdsom plus een bodemvergoeding van ${pct(L.bodem*100,2)} per jaar (samengesteld). Na 10 jaar is dat in dit voorbeeld ${eur(afr10)}. Elke 2 jaar kun je een deel van het B-deel overnemen (minimaal € 20.000, € 1.000 kosten per keer).</p></section>
+  <section><h2>4. Toetsing aan de normen 2027</h2>
+    <p class="uitleg">De inkomenstoets volgt de Tijdelijke regeling hypothecair krediet 2027: toetsinkomen × financieringslastpercentage (Nibud-tabel) geeft de maximale bruto maandlast; die wordt omgerekend naar een maximale hypotheek met een annuïteit over 30 jaar tegen de toetsrente (bij een rentevaste periode korter dan 10 jaar minimaal 5%). Daarnaast mag de lening niet hoger zijn dan de woningwaarde en geldt voor NHG een grens van € 500.000.</p>
+    <div>${$('i_checks').innerHTML}</div></section>
+  <section><h2>5. Maximale hypotheek op inkomen</h2>${rTbl('i_maxtbl')}
+    <p class="uitleg">De opbouw laat zien hoe de maximale hypotheek tot stand komt, inclusief eventuele extra ruimte voor alleenstaanden, het energielabel of energiebesparende voorzieningen. De regel "woningwaarde haalbaar met B-deel" is een productaanname (zie punt 9).</p></section>
+  <section><h2>6. Maandlasten in het eerste jaar</h2>${rTbl('i_maand')}
+    <p class="uitleg">Netto is na hypotheekrenteaftrek en bijtelling van het eigenwoningforfait volgens de belastingtarieven 2027. De vergelijking met een gewone hypotheek gaat uit van dezelfde rente voor het hele bedrag. Heffingskortingen en persoonlijke fiscale omstandigheden zijn niet meegenomen.</p></section>
+  <section><h2>7. Ontwikkeling in de tijd</h2>${rChart('i_chart','i_leg')}
+    <p class="uitleg">De grafiek toont de verwachte woningwaarde bij ${pct(L.g*100,1)} stijging per jaar, het resterende A-deel en de waarde van het B-deel (de afrekening als je op dat moment zou overnemen of verkopen), rekening houdend met het ingroeipad hieronder.</p></section>
+  <section class="pb"><h2>8. Ingroeipad</h2>${rTbl('i_pad')}
+    <p class="uitleg">Het ingroeipad is een voorbeeld van stapsgewijs overnemen van het B-deel. Elke overname wordt opnieuw getoetst op het inkomen en de normen van dat moment; overnemen is dus niet gegarandeerd. Bij financiering via het A-deel stijgt de maandlast.</p></section>
+  <section><h2>9. Aandachtspunten en compliance</h2><div class="afm">${$('i_afm').querySelector('.afmbody')?$('i_afm').querySelector('summary').innerHTML+$('i_afm').querySelector('.afmbody').innerHTML:$('i_afm').innerHTML}</div>
+    <p class="uitleg">Bespreek ook: het delen van waardestijging, de bodemvergoeding bij lage waardeontwikkeling, renterisico na de rentevaste periode en de productvoorwaarden (minimale overname, kosten en bodem zijn productafspraken, geen wettelijke normen).</p></section>`;
+}
+function rapportOpname(){
+  const L=LAST.op, okO=L.okStaffel&&L.ltv<=1.0001;
+  return `
+  <section><h2>1. Samenvatting</h2>
+    <div class="verdict ${okO?'ok':'bad'}">${okO?'✓ Opname van '+eur(L.O)+' is mogelijk':'✕ Opname van '+eur(L.O)+' past niet binnen de voorwaarden'}</div>
+    ${rKp([['Woningwaarde',eur(L.W)],['Netto uitkering',eur(L.O*(1-L.prem)),1],['Afrekening na '+L.H+' jaar',eur(L.c.claim)],['Netto erfgenamen',eur(L.netto)]])}
+    <p class="uitleg">Uit de overwaarde van de woning (${eur(L.W)}) wordt eenmalig ${eur(L.O)} vrijgemaakt; na ${pct(L.prem*100,1)} garantiepremie ontvang je netto ${eur(L.O*(1-L.prem))}. Over de opname betaal je geen maandelijkse rente of aflossing. Bij verkoop of overlijden ontvangt de geldverstrekker zijn aandeel (${pct(L.share*100,1)}) in de woningwaarde, met als minimum de opname plus ${pct(L.bodem*100,2)} per jaar. Bij vertrek na ${L.H} jaar is dat in dit voorbeeld ${eur(L.c.claim)}; de kosten komen dan neer op ${pct(L.effK,2)} per jaar over de netto uitkering.</p></section>
+  <section><h2>2. Uitgangspunten</h2><p class="uitleg">De berekening is gebaseerd op de volgende ingevulde gegevens.</p>${rapportInvoer('o')}</section>
+  <section><h2>3. Hoe werkt de Opnamehypotheek?</h2>
+    <p class="uitleg">Je ontvangt eenmalig een bedrag uit de overwaarde en blijft eigenaar en bewoner. Het maximum volgt een leeftijdsstaffel (bij ${L.age} jaar ${L.sp}% van de woningwaarde, ${eur(L.spMax)}). Bij verkoop of overlijden rekent de geldverstrekker af. De restschuldgarantie zorgt dat de afrekening nooit hoger is dan de verkoopopbrengst na aflossing van de bestaande hypotheek, mits de woning goed onderhouden en verzekerd is, niet zonder toestemming verhuurd of bezwaard is en marktconform wordt verkocht.</p></section>
+  <section><h2>4. Toetsing aan de normen 2027</h2>
+    <p class="uitleg">De bestaande hypotheek moet betaalbaar blijven. Die wordt getoetst met de financieringslasttabel voor AOW-gerechtigden 2027 (annuïtair over 30 jaar) en volgens de NHG-seniorenregeling op werkelijke lasten. Hypotheek en opname samen mogen niet hoger zijn dan de woningwaarde.</p>
+    <div>${$('o_checks').innerHTML}</div></section>
+  <section><h2>5. Bij vertrek na ${L.H} jaar</h2>${rTbl('o_exit1')}
+    <p class="uitleg">De afrekening is het hoogste van het aandeel van de geldverstrekker in de woningwaarde en de bodem (opname plus ${pct(L.bodem*100,2)} per jaar samengesteld), begrensd door de restschuldgarantie.</p></section>
+  <section><h2>6. Scenario's per woonduur</h2>${rTbl('o_exit')}
+    <p class="uitleg">Hoe langer je in de woning blijft, hoe hoger de afrekening. Het "rendement bank" is de jaarlijkse vergoeding over de bruto opname, exclusief de garantiepremie.</p></section>
+  <section class="pb"><h2>7. Ontwikkeling in de tijd</h2>${rChart('o_chart','o_leg')}
+    <p class="uitleg">De grafiek vergelijkt de afrekening van de opnamehypotheek met de schuld van een opeethypotheek waarbij de rente (${pct(L.opeetR*100,2)}) jaarlijks wordt bijgeschreven, bij ${pct(L.g*100,1)} waardestijging per jaar.</p></section>
+  <section><h2>8. Vergelijking met de opeethypotheek</h2>${rTbl('o_verg')}
+    <p class="uitleg">Welke vorm gunstiger is, hangt af van de waardeontwikkeling en de woonduur: bij een sterke waardestijging deelt de geldverstrekker mee in die stijging en kan de opnamehypotheek duurder uitvallen.</p></section>
+  <section><h2>9. Aandachtspunten en compliance</h2><div class="afm">${$('o_afm').querySelector('summary').innerHTML}${$('o_afm').querySelector('.afmbody').innerHTML}</div>
+    <p class="uitleg">De uitkering telt mee als vermogen (box 3, eigen bijdrage Wlz, zorgtoeslag). De woningopbrengst wordt gedeeld met de geldverstrekker; bespreek dit met de erfgenamen. Leeftijdsstaffel, garantiepremie en bodem zijn productvoorwaarden.</p></section>`;
+}
 function printPanel(){
-  const p=document.querySelector('.panel.on'); const css=document.querySelector('style').outerHTML;
+  const isI = $('p-ingroei').classList.contains('on');
   const w=window.open('','_blank'); if(!w){ alert('Sta pop-ups toe om af te drukken.'); return; }
-  const clone=p.cloneNode(true); clone.querySelectorAll('input,select').forEach(el=>{ const src=document.getElementById(el.id); const s=document.createElement('span'); s.textContent = src.tagName==='SELECT'? src.options[src.selectedIndex].text : (src.type==='checkbox'? (src.checked?'ja':'nee') : src.value); s.style.fontWeight='700'; el.replaceWith(s); });
-  w.document.write(`<!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8"><title>WoonFixx — afdruk</title>${css}<style>body{background:#fff}.panel{display:block}.scroll{max-height:none}.card,.kpi{box-shadow:none;border:1px solid #dde3ec;break-inside:avoid}@page{margin:12mm}</style></head><body><header class="hdr" style="position:static"><div class="hdr-in">${document.querySelector('.hdr .logo').outerHTML}</div></header><main>${clone.outerHTML}</main><div class="foot" style="color:#66748a;max-width:1320px;margin:0 auto;padding:6px 20px">${document.querySelector('.foot').innerHTML} Afgedrukt ${new Date().toLocaleDateString('nl-NL')}.</div></body></html>`);
+  const titel = isI ? 'Rekenrapport Ingroeihypotheek' : 'Rekenrapport Opnamehypotheek';
+  const datum = new Date().toLocaleDateString('nl-NL',{day:'numeric',month:'long',year:'numeric'});
+  const body = isI ? rapportIngroei() : rapportOpname();
+  w.document.write(`<!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8"><title>WoonFixx — ${titel}</title><style>${RAPPORT_CSS}</style></head><body><div class="r">
+    <div class="rh"><img src="${LOGO_SRC()}" alt="WoonFixx"><div class="t"><b>${titel}</b><span>${datum} · normen Trhk 2027 en NHG V&amp;N 2027-1</span></div></div>
+    ${body}
+    <div class="disc">Dit rapport is een indicatieve berekening en geen advies of aanbod. Aan de uitkomsten kunnen geen rechten worden ontleend. Bronnen: Tijdelijke regeling hypothecair krediet 2027 (Stcrt. 2026, 38415), Nibud Advies hypotheeknormen 2027, NHG Voorwaarden en normen 2027-1. Fiscale parameters 2027 en eigenwoningforfait zijn indicatief. Minimale toetsrente AFM: 5,0% (per kwartaal te controleren).</div>
+  </div></body></html>`);
   w.document.close(); w.focus(); setTimeout(()=>w.print(),400);
 }
 
@@ -1160,12 +1277,63 @@ function activeDeck(){
   if($('p-pop').classList.contains('on')) return DECKS.opname;
   return null;
 }
+// ---------- uitleg per dia (handout, voor de lezer) ----------
+const UITLEG = {
+  ingroei: [
+    L => `Deze presentatie laat zien hoe de Ingroeihypotheek werkt, met een rekenvoorbeeld voor een woning van ${eur(L.W)}. Alle bedragen zijn indicatief en gebaseerd op de leennormen van 2027.`,
+    L => `De onderwerpen die aan bod komen: van de vraag hoeveel je mag lenen tot de risico's en voor wie deze hypotheek geschikt is.`,
+    L => `Hoeveel je mag lenen, volgt uit de wettelijke leennormen (Trhk 2027, op advies van het Nibud). Bij een toetsinkomen van ${eur(L.inkomen)} is de maximale hypotheek ${eur(L.mh.max)}.${L.W>L.mh.max?' De woning van '+eur(L.W)+' is daarmee '+eur(L.W-L.mh.max)+' te duur voor een gewone hypotheek.':' De woning past binnen die norm.'}`,
+    L => `De financiering bestaat uit twee delen. Het A-deel (${eur(L.A)}) is een gewone hypotheek met rente en aflossing. Voor het B-deel (${eur(L.B)}) financiert de geldverstrekker mee; daarvoor krijgt die een aandeel van ${pct(L.bpct*100,0)} in de woningwaarde. Over het B-deel betaal je geen maandlasten.`,
+    L => `Omdat je alleen over het A-deel rente en aflossing betaalt, is de netto maandlast ${eur(L.nettoM)} in het eerste jaar: ${eur(L.regNetto-L.nettoM)} lager dan bij een gewone hypotheek voor de hele woning. Lagere maandlasten betekenen niet dat het goedkoper is: de kosten van het B-deel komen bij overname of verkoop.`,
+    L => `Bij overname of verkoop betaal je voor het B-deel het hoogste van twee bedragen: het aandeel van de geldverstrekker in de dan geldende woningwaarde, of de oorspronkelijke hoofdsom plus ${pct(L.bodem*100,2)} per jaar (de bodem). Bij een lage waardestijging bepaalt de bodem de prijs, bij een hoge waardestijging het aandeel in de waarde.`,
+    L => `Elke 2 jaar kun je een deel van het B-deel overnemen, minimaal € 20.000 per keer en met € 1.000 kosten. Je kunt dat betalen uit eigen geld of via een verhoging van het A-deel. Elke verhoging wordt opnieuw getoetst op je inkomen; overnemen is dus niet gegarandeerd.`,
+    L => `Verkoop je de woning, dan los je het A-deel af en ontvangt de geldverstrekker de afrekening van het B-deel. Wat overblijft, is voor jou. Het voorbeeld gaat uit van verkoop na 10 jaar zonder tussentijdse overnames en vóór verkoopkosten.`,
+    L => `De lening is getoetst op de normen van 2027: inkomen, woningwaarde en de NHG-grens. Let op: of het B-deel buiten de inkomenstoets mag blijven, moet juridisch nog worden bevestigd. Telt het wel mee, dan kan de lening niet passen.`,
+    L => `De Ingroeihypotheek past vooral bij mensen die langer in de woning willen blijven en een groeiend inkomen verwachten. Minder geschikt als je snel wilt verhuizen of de volledige waardestijging zelf wilt houden.`,
+    L => `Belangrijke risico's: je deelt de waardestijging, bij een lage waardeontwikkeling betaal je minimaal de bodemvergoeding, overnemen is niet gegarandeerd en de rente op het A-deel kan na de rentevaste periode stijgen.`,
+    L => `Kort samengevat: meer woning binnen de leennorm met een lagere maandlast, maar het B-deel is niet gratis en wordt later afgerekend. Stap voor stap kun je volledig eigenaar worden.`,
+    L => `Wil je je eigen situatie doorrekenen? Gebruik de rekentool en bespreek de uitkomst met je adviseur. Deze berekening is geen advies of aanbod.`,
+  ],
+  opname: [
+    L => `Deze presentatie laat zien hoe de Opnamehypotheek werkt, met een rekenvoorbeeld voor een woning van ${eur(L.W)} en een opname van ${eur(L.O)}. Alle bedragen zijn indicatief en gebaseerd op de normen van 2027.`,
+    L => `De onderwerpen die aan bod komen: van de huidige situatie en de mogelijkheden tot de kosten, de zekerheden en de aandachtspunten.`,
+    L => `De woning is ${eur(L.W)} waard en er staat nog ${eur(L.RS)} hypotheek op. De overwaarde is ${eur(L.W-L.RS)}. Met de opnamehypotheek maak je een deel daarvan vrij, zonder de woning te verkopen.`,
+    L => `Het vrijgemaakte geld kun je bijvoorbeeld gebruiken om de woning aan te passen of te verduurzamen, als aanvulling op het inkomen, om familie te helpen of voor zorg. Let op: het bedrag telt mee als vermogen en kan gevolgen hebben voor box 3, de eigen bijdrage Wlz en toeslagen.`,
+    L => `Je ontvangt eenmalig een bedrag. Over de opname betaal je geen maandelijkse rente of aflossing en je blijft eigenaar en bewoner. Bij verkoop of overlijden rekent de geldverstrekker af over zijn aandeel van ${pct(L.share*100,1)} in de woning.`,
+    L => `Hoeveel je kunt opnemen, hangt af van de leeftijd van de jongste partner. Bij ${L.age} jaar is dat maximaal ${L.sp}% van de woningwaarde (${eur(L.spMax)}). Van de opname wordt ${pct(L.prem*100,1)} garantiepremie ingehouden; je ontvangt netto ${eur(L.O*(1-L.prem))}.`,
+    L => `Bij vertrek betaal je het hoogste van: het aandeel van de geldverstrekker in de woningwaarde, of de opname plus ${pct(L.bodem*100,2)} per jaar. Na ${L.H} jaar is dat in dit voorbeeld ${eur(L.c.claim)}. Omgerekend zijn de kosten ${pct(L.effK,2)} per jaar over het bedrag dat je netto hebt ontvangen.`,
+    L => `De tabel laat zien hoeveel de afrekening bedraagt en wat er voor jou of je erfgenamen overblijft bij verschillende woonduren, uitgaande van ${pct(L.g*100,1)} waardestijging per jaar.`,
+    L => `Bij een opeethypotheek wordt de rente jaarlijks bij de schuld opgeteld. Welke vorm gunstiger is, hangt af van de waardeontwikkeling en hoe lang je in de woning blijft. Bij een sterke waardestijging kan de opnamehypotheek duurder uitvallen.`,
+    L => `De restschuldgarantie zorgt dat jij of je erfgenamen nooit hoeven bij te betalen als de verkoopopbrengst te laag is. Voorwaarden: goed onderhoud, een verzekerde woning, geen verhuur of extra lening zonder toestemming en verkoop tegen een marktconforme prijs.`,
+    L => `Bespreek vooraf de gevolgen voor vermogen en toeslagen, betrek de erfgenamen, controleer of de bestaande hypotheek betaalbaar blijft en houd er rekening mee dat de afrekening hoger wordt naarmate je langer blijft wonen.`,
+    L => `De opname past binnen de leeftijdsstaffel en de woningwaarde, en de bestaande hypotheek is getoetst op de normen voor AOW-gerechtigden 2027. Of de opname zelf buiten de inkomenstoets mag blijven, moet juridisch nog worden bevestigd.`,
+    L => `Kort samengevat: je maakt vermogen vrij zonder te verhuizen en zonder maandlasten over de opname. Bij vertrek wordt afgerekend, met de restschuldgarantie als vangnet.`,
+    L => `Wil je je eigen situatie doorrekenen? Gebruik de rekentool en bespreek de uitkomst met je adviseur en je familie. Deze berekening is geen advies of aanbod.`,
+  ],
+};
 function printDeck(d, title){
   const css=document.querySelector('style').outerHTML;
   const w=window.open('','_blank'); if(!w){ alert('Sta pop-ups toe om de handout af te drukken.'); return; }
-  const pages=d.slides.map((s,i)=>{ const el=d.el.querySelectorAll('.slide')[i];
-    return `<div class="pp"><div class="deck-stage"><section class="slide ${s.cls||''} on">${el.innerHTML}</section></div>${s.notes?`<div class="pn"><b>Toelichting:</b> ${esc(s.notes)}</div>`:''}</div>`; }).join('');
-  w.document.write(`<!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8"><title>WoonFixx — ${esc(title)}</title>${css}<style>body{background:#fff}.pp{page-break-after:always;break-after:page;padding:4mm 0}.deck-stage{box-shadow:none;border:1px solid #dde3ec;width:100%}.slide.on{animation:none}.pn{font-size:11px;color:#444;margin-top:4mm}@page{size:A4 landscape;margin:10mm}</style></head><body>${pages}</body></html>`);
+  const key = d===DECKS.ingroei ? 'ingroei' : 'opname', L = LAST[key==='ingroei'?'ing':'op'];
+  const datum = new Date().toLocaleDateString('nl-NL',{day:'numeric',month:'long',year:'numeric'});
+  const n = d.slides.length;
+  const pages=d.slides.map((s,i)=>{ const el=d.el.querySelectorAll('.slide')[i]; const u=UITLEG[key][i]; const tekst=u? u(L) : '';
+    return `<div class="pp"><div class="ph"><img src="${LOGO_SRC()}" alt="WoonFixx"><span>${esc(title)} · ${datum}</span><span>${i+1} / ${n}</span></div>
+      <div class="deck-stage"><section class="slide ${s.cls||''} on">${el.innerHTML}</section></div>
+      ${tekst?`<div class="pu"><h4>Uitleg</h4><p>${tekst}</p></div>`:''}</div>`; }).join('');
+  w.document.write(`<!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8"><title>WoonFixx — ${esc(title)}</title>${css}<style>
+    body{background:#fff}.pp{page-break-after:always;break-after:page;padding:0;display:flex;flex-direction:column;gap:5mm}
+    .ph{display:flex;align-items:center;gap:10px;background:#253659;color:#fff;border-radius:6px;padding:5px 10px;font-size:10px}
+    .ph img{height:16px}.ph span:last-child{margin-left:auto;font-weight:700}
+    .deck-stage{box-shadow:none;border:1px solid #dde3ec;width:86%;margin:0 auto;aspect-ratio:16/9!important;container-type:inline-size!important}
+    .slide{position:absolute!important;display:flex!important;min-height:0!important;padding:4.6% 6% 6.4%!important}.slide.on{animation:none}
+    .slide .snum{display:none}
+    .pu{border-left:4px solid #F6A21D;background:#f7f9fc;border-radius:0 8px 8px 0;padding:8px 12px}
+    .pu h4{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#66748a;margin-bottom:3px}
+    .pu p{font-size:12.5px;line-height:1.55;color:#1c2638}
+    @page{size:A4 landscape;margin:9mm}
+  </style></head><body>${pages}<div class="pp" style="justify-content:flex-start"><div class="ph"><img src="${LOGO_SRC()}" alt="WoonFixx"><span>${esc(title)} · ${datum}</span><span>Toelichting</span></div>
+    <div class="pu"><h4>Belangrijk</h4><p>Deze handout bevat een indicatieve berekening op basis van de leennormen 2027 (Tijdelijke regeling hypothecair krediet, Nibud) en de NHG Voorwaarden en normen 2027-1. Het is geen advies of aanbod; aan de uitkomsten kunnen geen rechten worden ontleend. Productvoorwaarden zoals de bodemvergoeding, de leeftijdsstaffel, de garantiepremie en de minimale overname zijn productafspraken en geen wettelijke normen. Of het B-deel of het opnamedeel buiten de inkomenstoets mag blijven, moet juridisch worden bevestigd.</p></div></div></body></html>`);
   w.document.close(); w.focus(); setTimeout(()=>w.print(),500);
 }
 
